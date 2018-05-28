@@ -21375,6 +21375,8 @@ with pkgs;
 
   ### PHYSICS
 
+  elmer = callPackage ../applications/science/physics/elmer { };
+
   sacrifice = callPackage ../applications/science/physics/sacrifice {};
 
   sherpa = callPackage ../applications/science/physics/sherpa {};
