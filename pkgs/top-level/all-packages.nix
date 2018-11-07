@@ -21375,6 +21375,8 @@ with pkgs;
 
   ### PHYSICS
 
+  code_aster = callPackage ../applications/science/physics/code_aster { };
+
   sacrifice = callPackage ../applications/science/physics/sacrifice {};
 
   sherpa = callPackage ../applications/science/physics/sherpa {};
