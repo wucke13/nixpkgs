@@ -16571,6 +16571,8 @@ in
   djview = callPackage ../applications/graphics/djview { };
   djview4 = pkgs.djview;
 
+  dlangide = callPackage ../applications/editors/dlangide { };
+
   dmenu = callPackage ../applications/misc/dmenu { };
 
   dmenu2 = callPackage ../applications/misc/dmenu2 { };
