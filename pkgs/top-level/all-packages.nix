@@ -22654,6 +22654,9 @@ in
 
   apmplanner2 = libsForQt59.callPackage ../applications/science/robotics/apmplanner2 { };
 
+
+  inav-configurator = callPackage ../applications/science/robotics/inav-configurator { };
+
   ### MISC
 
   acpilight = callPackage ../misc/acpilight { };
