@@ -27556,6 +27556,8 @@ in
 
   refind = callPackage ../tools/bootloaders/refind { };
 
+  screenruster = callPackage ../misc/screensavers/screenruster { };
+
   spectrojack = callPackage ../applications/audio/spectrojack { };
 
   sift = callPackage ../tools/text/sift { };
