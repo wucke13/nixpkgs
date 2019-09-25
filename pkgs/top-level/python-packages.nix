@@ -6020,6 +6020,8 @@ in {
 
   yarl = callPackage ../development/python-modules/yarl { };
 
+  solo-python = callPackage ../development/python-modules/solo-python { };
+
   suseapi = callPackage ../development/python-modules/suseapi { };
 
   typed-ast = callPackage ../development/python-modules/typed-ast { };
