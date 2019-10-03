@@ -16519,6 +16519,12 @@ in
 
   systemd = callPackage ../os-specific/linux/systemd {
     utillinux = utillinuxMinimal; # break the cyclic dependency
+    dbus = dbus.override { systemd = null; }; # break the cyclic dependency
+    gnupg = gnupg.override { 
+      guiSupport = false;
+      pcsclite = null;
+      libusb = null;
+    }; # break the cyclic dependency
   };
   udev = systemd; # TODO: move to aliases.nix
 
