@@ -37,7 +37,7 @@ stdenv.mkDerivation rec {
   postPatch = ''
     sed -i 's,hkps://hkps.pool.sks-keyservers.net,hkps://keys.openpgp.org,g' \
         configure doc/dirmngr.texi doc/gnupg.info-1
-  '' + stdenv.lib.optionalString stdenv.isLinux ''
+  '' + stdenv.lib.optionalString ( stdenv.isLinux && pcsclite != null) ''
     sed -i 's,"libpcsclite\.so[^"]*","${stdenv.lib.getLib pcsclite}/lib/libpcsclite.so",g' scd/scdaemon.c
   ''; #" fix Emacs syntax highlighting :-(
 
