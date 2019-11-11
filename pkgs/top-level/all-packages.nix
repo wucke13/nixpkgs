@@ -18250,6 +18250,8 @@ in
     plugins = [];
   };
 
+  deltachat-core = callPackage ../applications/networking/instant-messengers/deltachat-core { };
+
   dfasma = libsForQt5.callPackage ../applications/audio/dfasma { };
 
   dfilemanager = libsForQt5.callPackage ../applications/misc/dfilemanager { };
