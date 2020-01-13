@@ -23503,6 +23503,9 @@ in
 
   lumina = recurseIntoAttrs (callPackage ../desktops/lumina { });
 
+
+  liri-shell = qt5.callPackage ../desktops/liri/shell { };
+
   lxqt = recurseIntoAttrs (import ../desktops/lxqt {
     inherit pkgs libsForQt5;
     inherit (lib) makeScope;
