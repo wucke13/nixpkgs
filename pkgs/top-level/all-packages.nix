@@ -24099,6 +24099,8 @@ in
 
   sympow = callPackage ../development/libraries/science/math/sympow { };
 
+  trilinos = callPackage ../development/libraries/science/math/trilinos { };
+
   ipopt = callPackage ../development/libraries/science/math/ipopt { openblas = openblasCompat; };
 
   gmsh = callPackage ../applications/science/math/gmsh { };
