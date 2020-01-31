@@ -1,11 +1,11 @@
-{ stdenv, fetchurl, cmake, pkgconfig, boost, protobuf, freeimage
+{ stdenv, fetchFromBitbucket, cmake, pkgconfig, boost, protobuf, freeimage
   , boost-build, boost_process
   , xorg_sys_opengl, tbb, ogre, tinyxml-2
   , libtar, glxinfo,  libusb, libxslt, ignition
   , pythonPackages, utillinux
 
   # these deps are hidden; cmake doesn't catch them
-  , gazeboSimulator, sdformat ? gazeboSimulator.sdformat, curl, tinyxml, qt4
+  , gazeboSimulator, sdformat, curl, tinyxml, qt4
   , xlibsWrapper
   , withIgnitionTransport ? true
   , libav, withLibAvSupport ? true
@@ -17,18 +17,18 @@
   , gdal, withDigitalElevationTerrainsSupport ? true
   , gts, withConstructiveSolidGeometrySupport ? true
   , hdf5, withHdf5Support ? true
-  , version ? "7.0.0"
-  , src-sha256 ? "127q2g93kvmak2b6vhl13xzg56h09v14s4pki8wv7aqjv0c3whbl"
   , ...
 }: with stdenv.lib;
 
 stdenv.mkDerivation rec {
-  inherit version;
   pname = "gazebo";
+  version = "11.0.0";
 
-  src = fetchurl {
-    url = "https://osrf-distributions.s3.amazonaws.com/gazebo/releases/${pname}-${version}.tar.bz2";
-    sha256 = src-sha256;
+  src = fetchFromBitbucket {
+    owner = "osrf";
+    repo = pname;
+    rev = pname + builtins.head (builtins.splitVersion version) + "_" + version;
+    sha256 = "127q2g93kvmak2b6vhl13xzg56h09v14s4pki8wv7aqjv0c3whbl";
   };
 
   enableParallelBuilding = true; # gazebo needs this so bad
@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
     glxinfo
     libusb
     libxslt
-    ignition.math2
+    ignition.math
     sdformat
     pythonPackages.pyopengl
 
