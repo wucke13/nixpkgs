@@ -14119,6 +14119,8 @@ in
 
   SDL2_ttf = callPackage ../development/libraries/SDL2_ttf { };
 
+  sdformat = callPackage ../development/libraries/sdformat { };
+
   sdnotify-wrapper = skawarePackages.sdnotify-wrapper;
 
   sblim-sfcc = callPackage ../development/libraries/sblim-sfcc {};
