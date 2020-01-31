@@ -1,27 +1,27 @@
-{ stdenv, fetchurl, cmake }:
+{ stdenv, fetchFromBitbucket, cmake, eigen, ignition }:
 
-let
-  version = "2.6.0";
-in
-stdenv.mkDerivation {
-  pname = "ign-math2";
-  inherit version;
+stdenv.mkDerivation rec {
+  pname = "ignition-math";
+  version = "6.4.0";
 
-  src = fetchurl {
-    url = "http://gazebosim.org/distributions/ign-math/releases/ignition-math2-${version}.tar.bz2";
-    sha256 = "1d4naq0zp704c7ckj2wwmhplxmwkvcs1jib8bklnnd09lhg9j92j";
+  src = fetchFromBitbucket {
+    owner = "ignitionrobotics";
+    repo = "ign-" + builtins.toString (builtins.tail (builtins.splitVersion pname));
+    rev = pname + builtins.head (builtins.splitVersion version) + "_" + version;
+    sha256 = "0b90ccwsxv5fq3b33swr2b8vilaw6kwv2s5sxc1jgyx9gcznd2b1";
   };
 
-  buildInputs = [ cmake ];
-  preConfigure = ''
-    cmakeFlags="$cmakeFlags -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_INSTALL_LIBDIR=lib"
-  '';
+  nativeBuildInputs = [ cmake ];
+  buildInputs = [ eigen ignition.cmake ];
 
   meta = with stdenv.lib; {
-    homepage = https://ignitionrobotics.org/libraries/math;
-    description = "Math library by Ingition Robotics, created for the Gazebo project";
+    homepage = "https://ignitionrobotics.org/libs/math";
+    description = ''
+      Provides general purpose math classes and functions designed for robotic
+      applications.
+    '';
     license = licenses.asl20;
-    maintainers = with maintainers; [ pxc ];
+    maintainers = with maintainers; [ wucke13 ];
     platforms = platforms.all;
   };
 }

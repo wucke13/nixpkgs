@@ -4129,12 +4129,10 @@ in
       irods-icommands;
 
   ignition = recurseIntoAttrs {
-
+   
     cmake = callPackage ../development/libraries/ignition-cmake { };
 
     math = callPackage ../development/libraries/ignition-math { };
-
-    math2 = ignition.math;
 
     transport0 = callPackage ../development/libraries/ignition-transport/0.9.0.nix { };
 
