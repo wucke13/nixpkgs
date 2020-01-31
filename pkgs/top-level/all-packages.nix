@@ -4134,6 +4134,8 @@ in
 
     math = callPackage ../development/libraries/ignition-math { };
 
+    tools = callPackage ../development/libraries/ignition-tools { };
+
     transport0 = callPackage ../development/libraries/ignition-transport/0.9.0.nix { };
 
     transport1 = callPackage ../development/libraries/ignition-transport/1.0.1.nix { };
