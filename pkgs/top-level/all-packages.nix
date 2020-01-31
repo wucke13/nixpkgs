@@ -4130,6 +4130,8 @@ in
 
   ignition = recurseIntoAttrs {
 
+    cmake = callPackage ../development/libraries/ignition-cmake { };
+
     math = callPackage ../development/libraries/ignition-math { };
 
     math2 = ignition.math;
