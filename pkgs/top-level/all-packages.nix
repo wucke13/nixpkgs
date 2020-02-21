@@ -4105,6 +4105,8 @@ in
 
   humanfriendly = with python3Packages; toPythonApplication humanfriendly;
 
+  hunter = callPackage ../applications/misc/hunter { };
+
   hwinfo = callPackage ../tools/system/hwinfo { };
 
   hybridreverb2 = callPackage ../applications/audio/hybridreverb2 {
