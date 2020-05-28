@@ -18921,6 +18921,8 @@ in
   codeblocks = callPackage ../applications/editors/codeblocks { };
   codeblocksFull = codeblocks.override { contribPlugins = true; };
 
+  code-server = callPackage ../applications/editors/vscode/code-server.nix { };
+
   comical = callPackage ../applications/graphics/comical { };
 
   containerd = callPackage ../applications/virtualization/containerd { };
