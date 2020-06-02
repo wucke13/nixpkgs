@@ -24843,6 +24843,8 @@ in
 
   gmsh = callPackage ../applications/science/math/gmsh { };
 
+  gidpost = callPackage ../applications/science/math/gidpost { };
+
   zn_poly = callPackage ../development/libraries/science/math/zn_poly { };
 
   ### SCIENCE/MOLECULAR-DYNAMICS

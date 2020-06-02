@@ -1,0 +1,22 @@
+diff --git a/CMakeLists-old.txt b/CMakeLists.txt
+index dcd812c..96b1ed7 100644
+--- a/CMakeLists-old.txt
++++ b/CMakeLists.txt
+@@ -5,17 +5,6 @@ project (gidpost)
+ # location of Zlib
+ message( "user = $ENV{USERNAME}")
+ 
+-# for Windows
+-if (WIN32 AND $ENV{USERNAME} STREQUAL "miguel")
+-  if ( EXISTS C:/GID64-git/libZ/zlib-1.2.11)
+-    set( ZLIB_ROOT "C:/GID64-git/libZ/zlib-1.2.11")
+-  elseif ( EXISTS C:/GID64-git/libZ/windows)
+-    set( ZLIB_ROOT "C:/GID64-git/libZ/windows")
+-  else( EXISTS C:/GID64-git/libZ/windows)
+-    message( "ZLIB: trying to guess Zlib location")
+-  endif( EXISTS C:/GID64-git/libZ/zlib-1.2.11)
+-endif (WIN32 AND $ENV{USERNAME} STREQUAL "miguel")
+-
+ add_definitions ( -DHAVE_GIDPOST_CONFIG_H )
+ 
+ # The version number.
