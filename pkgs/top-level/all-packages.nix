@@ -27295,6 +27295,8 @@ in
 
   apmplanner2 = libsForQt514.callPackage ../applications/science/robotics/apmplanner2 { };
 
+  ardupilot-wiki = callPackage ../applications/science/robotics/ardupilot-wiki { };
+
   betaflight-configurator = callPackage ../applications/science/robotics/betaflight-configurator { };
 
   ### MISC

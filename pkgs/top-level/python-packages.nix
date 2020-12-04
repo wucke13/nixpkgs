@@ -6904,6 +6904,8 @@ in {
   else
     callPackage ../development/python-modules/sphinxcontrib-websupport/1_1.nix { };
 
+  sphinxcontrib-youtube = callPackage ../development/python-modules/sphinxcontrib-youtube { };
+
   sphinx = if isPy3k then
     callPackage ../development/python-modules/sphinx { }
   else
