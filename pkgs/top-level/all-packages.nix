@@ -27288,6 +27288,8 @@ in
 
   pcb = callPackage ../applications/science/electronics/pcb { };
 
+  picoscope = callPackage ../applications/science/electronics/picoscope { };
+
   qucs = callPackage ../applications/science/electronics/qucs { };
 
   xcircuit = callPackage ../applications/science/electronics/xcircuit { };
