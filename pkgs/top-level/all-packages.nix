@@ -3031,6 +3031,8 @@ in
 
   gebaar-libinput = callPackage ../tools/inputmethods/gebaar-libinput { };
 
+  libpicoipp = callPackage ../development/libraries/libpicoipp { };
+
   libpinyin = callPackage ../development/libraries/libpinyin { };
 
   libskk = callPackage ../development/libraries/libskk {
