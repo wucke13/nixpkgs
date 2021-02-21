@@ -6899,6 +6899,8 @@ in {
     texLive = pkgs.texlive.combine { inherit (pkgs.texlive) scheme-small standalone pgfplots; };
   };
 
+  sphinxcontrib-vimeo = callPackage ../development/python-modules/sphinxcontrib-vimeo { };
+
   sphinxcontrib-websupport = if isPy3k then
     callPackage ../development/python-modules/sphinxcontrib-websupport { }
   else
