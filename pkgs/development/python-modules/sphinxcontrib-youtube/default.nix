@@ -1,28 +1,27 @@
 { lib
 , buildPythonPackage
-, fetchPypi
+, fetchFromGitHub
 , sphinx
-, urllib3
-, six
 }:
 
 buildPythonPackage rec {
   pname = "sphinxcontrib-youtube";
-  version = "0.2";
+  version = "unstable-2021-02-21";
 
-  src = fetchPypi {
-    inherit version;
-    pname = "sphinxcontrib.youtube";
-    sha256 = "11463fziaqshywrij1qcz979i9szvq7zql83xzk6d7syjfgy0i70";
+  src = fetchFromGitHub {
+    rev = "635c8a908e3cac552ce43293c1516e7270cc4ce8";
+    owner = "sphinx-contrib";
+    repo = "youtube";
+    sha256 = "1wkvn0hw807lmyrm3w7ncn5jynm6ygp0qrarl8vj44dp15ypdk3y";
   };
 
-  propagatedBuildInputs = [ sphinx urllib3 ];
+  propagatedBuildInputs = [ sphinx ];
 
   doCheck = true;
 
   meta = {
     description = "Embedding youtube video to sphinx";
     homepage = "http://sphinx-doc.org/";
-    license = lib.licenses.lgpl3;
+    license = lib.licenses.bsd3;
   };
 }
