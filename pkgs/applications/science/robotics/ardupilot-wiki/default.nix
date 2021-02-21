@@ -14,10 +14,35 @@ stdenv.mkDerivation {
   nativeBuildInputs = [ 
     python3Packages.sphinx 
     python3Packages.sphinx_rtd_theme
+    python3Packages.sphinxcontrib-vimeo
+    python3Packages.sphinxcontrib-youtube
     rsync 
   ];
 
-  buildPhase = "make all";
+  enableParallelBuilding = true;
+
+  ALL_WIKIS= [ 
+    "copter" 
+    "plane" 
+    "rover" 
+    "antennatracker" 
+    "dev" 
+    "planner"
+    "planner2" 
+    "ardupilot" 
+    "mavproxy" 
+  ];
+
+  buildPhase = ''
+    mkdir -p $out
+    for wiki in $ALL_WIKIS
+    do
+      cd $wiki
+      make html
+      mv build/html $out/$wiki
+      cd ..
+    done
+  '';
 
   meta = with stdenv.lib; {
     description = "The complete ArduPilot wiki";
