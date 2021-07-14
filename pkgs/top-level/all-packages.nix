@@ -1847,6 +1847,8 @@ in
 
   base16-builder = callPackage ../misc/base16-builder { };
 
+  base16-builder-rust = callPackage ../misc/base16-builder-rust { };
+
   basex = callPackage ../tools/text/xml/basex { };
 
   bashplotlib = callPackage ../tools/misc/bashplotlib { };
