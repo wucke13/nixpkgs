@@ -918,7 +918,7 @@ with pkgs;
   sirula = callPackage ../tools/wayland/sirula { };
 
   srcOnly = callPackage ../build-support/src-only { };
-
+    
   subnetcalc = callPackage ../tools/networking/subnetcalc { };
 
   substitute = callPackage ../build-support/substitute/substitute.nix { };
@@ -10991,6 +10991,8 @@ with pkgs;
   sstp = callPackage ../tools/networking/sstp {};
 
   stgit = callPackage ../applications/version-management/git-and-tools/stgit { };
+
+  stratux = callPackage ../applications/radio/stratux { };
 
   strip-nondeterminism = perlPackages.strip-nondeterminism;
 
