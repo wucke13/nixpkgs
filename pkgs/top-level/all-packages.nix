@@ -6324,6 +6324,8 @@ with pkgs;
 
   bbin = callPackage ../development/tools/bbin { };
 
+  blackjack =callPackage ../applications/graphics/blackjack { };
+
   bore = callPackage ../tools/networking/bore {
     inherit (darwin) Libsystem;
     inherit (darwin.apple_sdk.frameworks) SystemConfiguration;
