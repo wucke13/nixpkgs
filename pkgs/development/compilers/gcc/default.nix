@@ -16,6 +16,7 @@
 , gmp, mpfr, libmpc, gettext, which, patchelf, binutils
 , isl ? null # optional, for the Graphite optimization framework.
 , zlib ? null
+, zstd ? null
 , libucontext ? null
 , gnat-bootstrap ? null
 , enableMultilib ? false
@@ -174,6 +175,7 @@ let
         which
         zip
         zlib
+        zstd
       ;
     } // optionalAttrs (!atLeast7) {
       inherit
@@ -393,6 +395,7 @@ pipe ((callFile ./common/builder.nix {}) ({
 
     CPATH = optionals (targetPlatform == hostPlatform) (makeSearchPathOutput "dev" "include" ([]
       ++ optional (zlib != null) zlib
+      ++ optional (zstd != null) zstd.dev
       ++ optional langJava boehmgc
       ++ optionals javaAwtGtk xlibs
       ++ optionals javaAwtGtk [ gmp mpfr ]
@@ -400,6 +403,7 @@ pipe ((callFile ./common/builder.nix {}) ({
 
     LIBRARY_PATH = optionals (targetPlatform == hostPlatform) (makeLibraryPath (
       optional (zlib != null) zlib
+      ++ optional (zstd != null) zstd
       ++ optional langJava boehmgc
       ++ optionals javaAwtGtk xlibs
       ++ optionals javaAwtGtk [ gmp mpfr ]
