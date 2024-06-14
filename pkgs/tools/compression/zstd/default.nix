@@ -19,13 +19,13 @@
 , haskellPackages
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "zstd";
   version = "1.5.6";
 
   # zstd is used as dependency of gcc, hence fetchFromGitHub would block the gcc bootstrapping
   src = fetchurl {
-    url = "https://github.com/facebook/zstd/archive/refs/tags/v${version}.tar.gz";
+    url = "https://github.com/facebook/zstd/archive/refs/tags/v${finalAttrs.version}.tar.gz";
     hash = "sha256-MPNfccEgM2ncl57N4EAP/qk8Jzkb/SrFqXFdIXPZL/c=";
   };
 
@@ -125,4 +125,4 @@ stdenv.mkDerivation rec {
     platforms = platforms.all;
     maintainers = with maintainers; [ orivej ];
   };
-}
+})
