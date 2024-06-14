@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, cmake, bash, gnugrep
+{ lib, stdenv, fetchurl, cmake, bash, gnugrep
 , fixDarwinDylibNames
 , file
 , legacySupport ? false
@@ -23,11 +23,10 @@ stdenv.mkDerivation rec {
   pname = "zstd";
   version = "1.5.6";
 
-  src = fetchFromGitHub {
-    owner = "facebook";
-    repo = "zstd";
-    rev = "v${version}";
-    hash = "sha256-qcd92hQqVBjMT3hyntjcgk29o9wGQsg5Hg7HE5C0UNc=";
+  # zstd is used as dependency of gcc, hence fetchFromGitHub would block the gcc bootstrapping
+  src = fetchurl {
+    url = "https://github.com/facebook/zstd/archive/refs/tags/v${version}.tar.gz";
+    hash = "sha256-MPNfccEgM2ncl57N4EAP/qk8Jzkb/SrFqXFdIXPZL/c=";
   };
 
   nativeBuildInputs = [ cmake ]
