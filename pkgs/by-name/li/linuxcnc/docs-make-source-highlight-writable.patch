@@ -1,0 +1,12 @@
+diff --git a/docs/src/source-highlight/Submakefile b/docs/src/source-highlight/Submakefile
+index af2940aa04..db9107e8d6 100644
+--- a/docs/src/source-highlight/Submakefile
++++ b/docs/src/source-highlight/Submakefile
+@@ -30,6 +30,7 @@ ifeq (,$(findstring lang.map,$(wildcard $(HL_DIR)/*)))#
+ endif
+ 	rm -rf $(LOC_HL_DIR)/local
+ 	cp -r $(HL_DIR) $(LOC_HL_DIR)/local
++	chmod --recursive +w -- $(LOC_HL_DIR)
+ 	mv $(LOC_HL_DIR)/local/lang.map $(LOC_HL_DIR)/local/lang.map.dist
+ 	cp $(LOC_HL_DIR)/*.lang $(LOC_HL_DIR)/local
+ 	grep -v $(GREPARG) $(LOC_HL_DIR)/local/lang.map.dist >$(TARGET)

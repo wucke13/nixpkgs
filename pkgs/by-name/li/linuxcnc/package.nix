@@ -29,7 +29,6 @@
   gtk3,
   gtksourceview4,
   hicolor-icon-theme,
-  intltool,
   kmod,
   libGLU,
   libedit,
@@ -54,6 +53,23 @@
   tclPackages,
   tk,
   which,
+
+  enableDocumentation ? true,
+
+  asciidoc-full, # required for dblatex to work
+  dblatexFull,
+  dpkg,
+  fontconfig,
+  ghostscript_headless,
+  graphviz-nox,
+  imagemagick_light,
+  inkscape,
+  intltool,
+  libxslt,
+  perlPackages,
+  sourceHighlight,
+  texlive,
+  writableTmpDirAsHomeHook,
 
   /*
     Whether to compile the user-space implementation for use on Linux with PREEMPT_RT. See
@@ -81,9 +97,25 @@
     `ps.pyqtwebengine` which in term implicates the use of a CVE riddled `qtwebengine`.
   */
   enableQt ? false,
-}:
+}@args:
 
 let
+  texEnv = texlive.combined.scheme-full;
+
+  # avoid having both `asciidoc` and `asciidoc-full` at the same time
+  asciidocCustom =
+    if enableDocumentation then
+      args.asciidoc-full.override {
+        dblatexFull = dblatexCustom;
+        texliveMinimal = texEnv;
+      }
+    else
+      args.asciidoc;
+
+  dblatexCustom = dblatexFull.override {
+    tex = texEnv;
+  };
+
   pythonEnv = (
     python3.withPackages (
       ps:
@@ -125,6 +157,10 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-q/tuSBJ14bCTax2mnq3R/1gSTKgb6jBpNVbf5oPPy0E=";
   };
 
+  env = lib.attrsets.optionalAttrs enableDocumentation {
+    FONTCONFIG_FILE = "${fontconfig.out}/etc/fonts/fonts.conf";
+  };
+
   strictDeps = true;
   nativeBuildInputs = [
     autoreconfHook
@@ -132,7 +168,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     makeWrapper
 
-    asciidoc # required even without `--enable-build-documentation` for the man pages
+    asciidocCustom # required even without `--enable-build-documentation` for the man pages
     gobject-introspection
     groff
     intltool
@@ -142,6 +178,19 @@ stdenv.mkDerivation (finalAttrs: {
     pythonEnv
     util-linux
     which
+  ]
+  ++ lib.lists.optionals enableDocumentation [
+    dblatexCustom
+    dpkg # for `dpkg-parsechangelog`
+    ghostscript_headless
+    graphviz-nox
+    imagemagick_light # the configure script checks for presence of `convert`
+    inkscape
+    libxslt
+    perlPackages.W3CLinkChecker
+    sourceHighlight
+    texEnv # the configure script checks for presence of `pdflatex`
+    writableTmpDirAsHomeHook # for fontconfig cache
   ]
   ++ lib.lists.optionals enableQt [
     qt5.wrapQtAppsHook
@@ -231,6 +280,20 @@ stdenv.mkDerivation (finalAttrs: {
     # fix all share/linuxcnc paths in the scripts
     + ''
       findAndSubstitute /usr/share/linuxcnc "$out/share/linuxcnc"
+    ''
+    # fix hardcoded path to asciidoc web assets
+    + lib.optionalString enableDocumentation ''
+      substituteInPlace docs/src/Submakefile \
+        --replace-fail ' /etc/asciidoc/' ' ${asciidoc-full}/lib/python*/site-packages/asciidoc/resources/'
+    ''
+    # fix hardcoded path to source-highlight
+    + lib.optionalString enableDocumentation ''
+      substituteInPlace docs/src/source-highlight/Submakefile \
+        --replace-fail '/usr/share/source-highlight' '${sourceHighlight}/share/source-highlight'
+    ''
+    # fix shebang in documentation helper script
+    + lib.optionalString enableDocumentation ''
+      patchShebangs docs/src/image-wildcard
     '';
 
   postAutoreconf = ''
@@ -253,7 +316,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   configureFlags = [
-    "--enable-build-documentation"
     "--exec-prefix=${placeholder "out"}"
     "--with-boost-libdir=${boost_python}/lib"
     "--with-boost-python=boost_python3"
@@ -265,6 +327,7 @@ stdenv.mkDerivation (finalAttrs: {
     # (GPL-3 or later).
     "--enable-non-distributable=yes"
   ]
+  ++ lib.optional enableDocumentation "--enable-build-documentation"
   ++ lib.optional enableUspace "--with-realtime=uspace";
 
   __structuredAttrs = true;
