@@ -29,7 +29,6 @@
   gtk3,
   gtksourceview4,
   hicolor-icon-theme,
-  intltool,
   kmod,
   libGLU,
   libepoxy,
@@ -53,6 +52,23 @@
   tclPackages,
   tk,
   which,
+
+  enableDocumentation ? true,
+
+  asciidoc-full, # required for dblatex to work
+  dblatexFull,
+  dpkg,
+  fontconfig,
+  ghostscript_headless,
+  graphviz-nox,
+  imagemagick_light,
+  inkscape,
+  intltool,
+  libxslt,
+  perlPackages,
+  sourceHighlight,
+  texlive,
+  writableTmpDirAsHomeHook,
 
   /*
     Whether to compile the user-space implementation for use on Linux with PREEMPT_RT. See
@@ -80,9 +96,25 @@
     `ps.pyqtwebengine` which in term implicates the use of a CVE riddled `qtwebengine`.
   */
   enableQt ? false,
-}:
+}@args:
 
 let
+  texEnv = texlive.combined.scheme-full;
+
+  # avoid having both `asciidoc` and `asciidoc-full` at the same time
+  asciidocCustom =
+    if enableDocumentation then
+      args.asciidoc-full.override {
+        dblatexFull = dblatexCustom;
+        texliveMinimal = texEnv;
+      }
+    else
+      args.asciidoc;
+
+  dblatexCustom = dblatexFull.override {
+    tex = texEnv;
+  };
+
   pythonEnv = (
     python3.withPackages (
       ps:
@@ -125,6 +157,10 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-8QZg+K/ROa0Z+5xFWvsqGPjM0pu9k24t/MS2zw02iy0=";
   };
 
+  env = lib.attrsets.optionalAttrs enableDocumentation {
+    FONTCONFIG_FILE = "${fontconfig.out}/etc/fonts/fonts.conf";
+  };
+
   strictDeps = true;
   nativeBuildInputs = [
     autoreconfHook
@@ -132,7 +168,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     makeWrapper
 
-    asciidoc # required even without `--enable-build-documentation` for the man pages
+    asciidocCustom # required even without `--enable-build-documentation` for the man pages
     gobject-introspection
     groff
     intltool
@@ -142,6 +178,19 @@ stdenv.mkDerivation (finalAttrs: {
     pythonEnv
     util-linux
     which
+  ]
+  ++ lib.lists.optionals enableDocumentation [
+    dblatexCustom
+    dpkg # for `dpkg-parsechangelog`
+    ghostscript_headless
+    graphviz-nox
+    imagemagick_light # the configure script checks for presence of `convert`
+    inkscape
+    libxslt
+    perlPackages.W3CLinkChecker
+    sourceHighlight
+    texEnv # the configure script checks for presence of `pdflatex`
+    writableTmpDirAsHomeHook # for fontconfig cache
   ]
   ++ lib.lists.optionals enableQt [
     qt5.wrapQtAppsHook
@@ -217,6 +266,15 @@ stdenv.mkDerivation (finalAttrs: {
       hash = "sha256-8iG55vRFGPZ9iiV5dWlhPrgeUaA0sk42iNqXstLl3Sg=";
     })
 
+    # # TODO remove on the next release after 2.9.8
+    # # This is a patch to make sure that `G1` and `G38.n` wait for the spindle to reach speed, also
+    # # when the spindle was disabled (i.e. via `M5).
+    # # See https://github.com/LinuxCNC/linuxcnc/pull/4160 for context.
+    # (fetchurl {
+    #   url = "https://github.com/LinuxCNC/linuxcnc/commit/203abbf46f9c7d12b737d2523ec1432f1b721561.patch";
+    #   hash = "sha256-oy9Xf+AXseCR325c6aXD9H4x5Vn6Cz4wf/rOiKwX6DA=";
+    # })
+
     # TODO remove on the next release after 2.9.8
     # This patch fixes an amibguity in whether the current tool offset is actually applied or not.
     # See https://github.com/LinuxCNC/linuxcnc/pull/3996 for context.
@@ -224,7 +282,8 @@ stdenv.mkDerivation (finalAttrs: {
       url = "https://github.com/LinuxCNC/linuxcnc/commit/267094af33f3c5ec70c816f44f78e85b9776868d.patch";
       hash = "sha256-zRrHf3zXrw7xL2RcQM9QGIPPoQZtFrUnVaWGAbJH0jA=";
     })
-  ];
+  ]
+  ++ lib.lists.optional enableDocumentation ./docs-make-source-highlight-writable.patch;
 
   postPatch =
     # generic helper function to find and substitute strings
@@ -246,6 +305,20 @@ stdenv.mkDerivation (finalAttrs: {
     # fix all share/linuxcnc paths in the scripts
     + ''
       findAndSubstitute /usr/share/linuxcnc "$out/share/linuxcnc"
+    ''
+    # fix hardcoded path to asciidoc web assets
+    + lib.optionalString enableDocumentation ''
+      substituteInPlace docs/src/Submakefile \
+        --replace-fail ' /etc/asciidoc/' ' ${asciidoc-full}/lib/python*/site-packages/asciidoc/resources/'
+    ''
+    # fix hardcoded path to source-highlight
+    + lib.optionalString enableDocumentation ''
+      substituteInPlace docs/src/source-highlight/Submakefile \
+        --replace-fail '/usr/share/source-highlight' '${sourceHighlight}/share/source-highlight'
+    ''
+    # fix shebang in documentation helper script
+    + lib.optionalString enableDocumentation ''
+      patchShebangs docs/src/image-wildcard
     '';
 
   postAutoreconf = ''
@@ -271,7 +344,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   configureFlags = [
-    "--enable-build-documentation"
     "--exec-prefix=${placeholder "out"}"
     "--with-boost-libdir=${boost_python}/lib"
     "--with-boost-python=boost_python3"
@@ -283,6 +355,7 @@ stdenv.mkDerivation (finalAttrs: {
     # (GPL-3 or later).
     "--enable-non-distributable=yes"
   ]
+  ++ lib.optional enableDocumentation "--enable-build-documentation"
   ++ lib.optional enableUspace "--with-realtime=uspace";
 
   __structuredAttrs = true;
