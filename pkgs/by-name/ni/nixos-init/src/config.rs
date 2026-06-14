@@ -24,7 +24,21 @@ impl Config {
 
         let boot_json: BootJson = fs::read(bootspec_path)
             .context("Failed to read bootspec file")
-            .and_then(|raw| serde_json::from_slice(&raw).context("Failed to read bootspec JSON"))?;
+            .and_then(|raw| {
+                let mut bootspec: serde_json::Value =
+                    serde_json::from_slice(&raw).context("Failed to parse bootspec JSON")?;
+                if let Ok(serde_json::Value::Object(map)) = bootspec
+                    .get_mut("org.nixos.bootspec.v1")
+                    .context("Bootspec does not contain NixOS bootspec key")
+                {
+                    map.entry("kernel").or_insert("/dev/null".into());
+                    map.entry("kernel_params").or_insert(from_value([])?);
+                } else {
+                    anyhow::bail!("Bootspec does not contain nixos bootspec key")
+                }
+                eprintln!("{bootspec:#?}");
+                serde_json::from_value(bootspec).context("Failed to read bootspec JSON")
+            })?;
 
         let config = boot_json
             .extensions
