@@ -23,6 +23,10 @@
     };
 
   enableOCR = true;
+  extraPythonPackages =
+    ps: with ps; [
+      pytesseract
+    ];
 
   testScript =
     { nodes, ... }:
@@ -30,6 +34,7 @@
       user = nodes.machine.users.users.alice;
     in
     ''
+      import pytesseract
       import shlex
 
       machine.wait_for_x()
@@ -49,11 +54,33 @@
         machine.succeed("xdotool getactivewindow windowsize --sync 100% 100%")
 
       screenshot_counter: int = 0
-      def screenshot(name: str):
+      def screenshot(name: str) -> str:
         global screenshot_counter
-        machine.screenshot(f"{screenshot_counter:02d}-{name}")
+        file_stem = f"{screenshot_counter:02d}-{name}"
+        machine.screenshot(file_stem)
         screenshot_counter += 1
+        return file_stem + ".png"
 
+      def mouse_move_to_text(search_term: str, nth_match: int = 0, image_path: str | None = None) -> bool:
+        if not image_path:
+          machine.succeed("xdotool mousemove_relative --sync 8192 8192")
+          temp_image_stem ="temp-mouse-move"
+          machine.screenshot(temp_image_stem)
+          image_path = temp_image_stem + ".png"
+
+        data = pytesseract.image_to_data(image_path, output_type=pytesseract.Output.DICT)
+
+        try:
+          text_matches = [i for i, text in enumerate(data["text"]) if search_term == text]
+          i = text_matches[nth_match]
+          (x, y, w, h) = (data["left"][i], data["top"][i], data["width"][i], data["height"][i])
+          machine.succeed(f"xdotool mousemove --sync {int(x + w / 2)} {int(y + h / 2)}")
+          return True
+        except IndexError:
+          return False
+
+      def mouse_click(button=1):
+        machine.succeed(f"xdotool click {button}")
 
       with subtest("Test latency-test"):
         spawn_as_user("latency-test")
@@ -146,6 +173,36 @@
         machine.send_key("ret")
         machine.wait_until_fails("pgrep rtapi_app")
 
+      with subtest("Test gmoccapy GUI"):
+        spawn_as_user("linuxcnc")
+        machine.wait_for_window("LinuxCNC Configuration Selector")
+        window_maximize()
+        machine.wait_for_text("Welcome to LinuxCNC.")
+
+        # fold "My Configurations"
+        mouse_move_to_text("My")
+        mouse_click()
+        machine.send_key("left")
+
+        # Select "Sample Configurations"
+        mouse_move_to_text("Sample")
+        mouse_click()
+        machine.send_key("right")
+        mouse_move_to_text("gmoccapy")
+        machine.send_key("right")
+        machine.send_key("down")
+        machine.send_key("ret")
+
+      with subtest("Test copy to new gmoccapy config"):
+        machine.send_key("ret")
+        machine.wait_for_text("Would you like to copy the")
+        machine.send_key("ret")
+        machine.wait_for_text("The configuration file has been copied to")
+        machine.send_key("ret")
+
+      with subtest("Test gmoccapy GUI"):
+        machine.wait_for_window("^gmoccapy for LinuxCNC")
+        screenshot("linuxcnc-gmoccapy")
 
       machine.shutdown()
     '';
