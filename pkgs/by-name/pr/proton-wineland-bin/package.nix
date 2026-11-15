@@ -9,9 +9,6 @@ mkProtonBinDerivation (finalAttrs: {
   pname = "proton-wineland-bin";
   version = "11.0-20261114";
 
-  __structuredAttrs = true;
-  strictDeps = true;
-
   steamDisplayName = "Proton-Wineland";
 
   variants = {
